@@ -45,11 +45,63 @@ services:
     depends_on: [app, phpmyadmin]
     networks: [frontend]
 
+  prometheus:
+    image: prom/prometheus:v2.53.0
+    restart: unless-stopped
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prom_data:/prometheus
+    networks: [monitoring]
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    restart: unless-stopped
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    networks: [monitoring]
+
+  mysqld-exporter:
+    image: prom/mysqld-exporter:v0.15.1
+    restart: unless-stopped
+    command:
+      - "--mysqld.address=db:3306"
+      - "--mysqld.username=exporter"
+    environment:
+      MYSQLD_EXPORTER_PASSWORD: ${EXPORTER_PASSWORD}
+    depends_on: [db]
+    networks: [monitoring, backend]
+
+  nginx-exporter:
+    image: nginx/nginx-prometheus-exporter:1.2
+    restart: unless-stopped
+    command:
+      - "--nginx.scrape-uri=http://nginx:8080/nginx_status"
+    depends_on: [nginx]
+    networks: [monitoring, frontend]
+
+  grafana:
+    image: grafana/grafana:11.1.0
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    ports: ["127.0.0.1:3001:3000"]
+    networks: [monitoring]
+
 networks:
   frontend:
   backend:
     internal: true
+  monitoring:
 
 volumes:
   db_data:
   nginx_logs:
+  prom_data:
+  grafana_data:

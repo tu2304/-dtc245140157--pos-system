@@ -1,0 +1,28 @@
+{
+  "title": "POS Monitoring",
+  "uid": "pos-monitoring",
+  "schemaVersion": 39,
+  "refresh": "10s",
+  "time": { "from": "now-15m", "to": "now" },
+  "panels": [
+    { "id": 1, "type": "timeseries", "title": "Trang thai dich vu (1 = hoat dong)",
+      "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 },
+      "targets": [ { "refId": "A", "expr": "up", "legendFormat": "{{job}}" } ] },
+    { "id": 2, "type": "timeseries", "title": "CPU cua container",
+      "gridPos": { "x": 12, "y": 0, "w": 12, "h": 8 },
+      "targets": [ { "refId": "A", "expr": "sum by (name) (rate(container_cpu_usage_seconds_total{name!=\"\"}[1m]))", "legendFormat": "{{name}}" } ] },
+    { "id": 3, "type": "timeseries", "title": "RAM cua container",
+      "gridPos": { "x": 0, "y": 8, "w": 12, "h": 8 },
+      "fieldConfig": { "defaults": { "unit": "bytes" }, "overrides": [] },
+      "targets": [ { "refId": "A", "expr": "container_memory_usage_bytes{name!=\"\"}", "legendFormat": "{{name}}" } ] },
+    { "id": 4, "type": "timeseries", "title": "MySQL - So ket noi",
+      "gridPos": { "x": 12, "y": 8, "w": 12, "h": 8 },
+      "targets": [ { "refId": "A", "expr": "mysql_global_status_threads_connected", "legendFormat": "connections" } ] },
+    { "id": 5, "type": "timeseries", "title": "MySQL - Truy van moi giay",
+      "gridPos": { "x": 0, "y": 16, "w": 12, "h": 8 },
+      "targets": [ { "refId": "A", "expr": "rate(mysql_global_status_queries[1m])", "legendFormat": "queries/s" } ] },
+    { "id": 6, "type": "timeseries", "title": "Nginx - Request moi giay",
+      "gridPos": { "x": 12, "y": 16, "w": 12, "h": 8 },
+      "targets": [ { "refId": "A", "expr": "rate(nginx_http_requests_total[1m])", "legendFormat": "requests/s" } ] }
+  ]
+}
