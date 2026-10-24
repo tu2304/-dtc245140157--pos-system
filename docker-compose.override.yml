@@ -1,0 +1,16 @@
+services:
+  app:
+    read_only: true
+    tmpfs: [/tmp]
+    mem_limit: 256m
+    pids_limit: 100
+  db:
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 768m
+  phpmyadmin:
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 256m
+  nginx:
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 128m
+    pids_limit: 100
